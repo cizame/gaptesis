@@ -401,6 +401,20 @@ CantidadDeGeneradores:= function (a,b,c)
     return 0;
 end;
 
+EsGraficaDeCayley := function (g)
+    local aut,cc,reps,l,esono,i;
+    aut := AutGroupGraph(g);
+    if IsTransitive(aut,Vertices(g)) and Order(aut)=OrderGraph(g) then
+        return true;
+    else
+        esono := false;
+        cc := ConjugacyClassesSubgroups(aut);
+        reps := List(cc,x-x[1]);
+        l := List([1..Length(reps)],x->[x,Order(reps[x])]);
+        l := Filtered(l,x->x[2]=OrderGraph(g));
+    fi;
+    return;
+end;
 
 
 
