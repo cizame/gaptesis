@@ -364,7 +364,8 @@ end;
 
 
 
-CantidaddeGrupos:= function (a,b) # Calcula la cantidad de grupos en un intervalo
+CantidaddeGrupos:= function (a,b)
+# Calcula la cantidad de grupos en un intervalo
     local i,j,Grupos,CondicionUno, CondicionDos;
     for i in [a..b] do
         PrintTo("/dev/tty","cardinalidad del grupo = ",i,"   \n");
@@ -376,7 +377,8 @@ end;
 
 
 
-CantidadDeGeneradores:= function (a,b,c) # Imprime el grupo y la cardinalidad de este, en caso de que el numero de generadores sea c.
+CantidadDeGeneradores:= function (a,b,c)
+# Imprime el grupo y la cardinalidad de este, en caso de que el numero de generadores sea c.
     local i,j,Grupos,NumeroGeneradores,medida,x;
 
     for i in [a..b] do
