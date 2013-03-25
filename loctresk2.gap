@@ -103,8 +103,9 @@ ConjuntoTSegundo := function (a,b) # Verifica que los elementos no cumplan con l
 end;
 
 ExaminaGrupoCondicionUno := function (g,CUELLO)  # Recibe un grupo
-    local i,c,c1,l,l1,t,tbuena,seis,aut,orbs,reps,OrdendeG,GrupoGenerado,Orden;
-    l := Filtered(Elements(g),x->Order(x)=3);
+    local i,c,c1,l,l1,t,tbuena,seis,aut,orbs,reps,OrdendeG,GrupoGenerado,Orden,g1;
+    g1:=Filtered(Elements(g), x-> not x in Centre(g));
+    l := Filtered(Elements(g1),x->Order(x)=3);
     l1:=EliminaInversos(l);
     c1 := Combinations(l1,3);
     OrdendeG:=Order(g);
@@ -156,23 +157,26 @@ end;
 # Para examinar la condicion dos
 
 ExaminaGrupoCondicionDos := function (g,CUELLO)
-    local i,c,c1,l,t,tbuena,seis,aut,orbs,reps,Orden,GrupoGenerado,OrdendeG,CUEllo,aux;
-    # Print(" usando el filtered \n");
+    local i,c,c1,l,t,tbuena,seis,aut,orbs,reps,Orden,GrupoGenerado,OrdendeG,CUEllo,aux,g1;
     CUEllo:=CUELLO/2-1;   
-    l := Filtered (Elements(g),x-> Order(x)>CUEllo);
+    g1:=Filtered(Elements(g), x-> not x in Centre(g));
+    
+    l := Filtered (Elements(g1),x-> Order(x)>CUEllo);
     c1 := Combinations(l,2);
     OrdendeG:=Order(g);
     c:=[];
 
     for i in [1..Length(c1)] do 
+     
         #    aux:=List(c1[i]);      ......../////////////......................//////////////////////////....................////////////
-        #   if aux[1] in Subgroup(g,aux[2]) then 
+        if not c1[i][1] in Centralizer(g,c1[i][2]) then 
         GrupoGenerado:=Group(c1[i]);    
         Orden:=Order(GrupoGenerado); 
-        if Orden = OrdendeG then   
+        if Orden = OrdendeG then  
+#            Print("///////////////////Prueba c[i][j] ", c1[i][1], " y ", c1[i][2]);
             Add(c,c1[i]);
         fi;
-        #   fi; 
+        fi; 
     od;
 
     #Print("Hay ",Length(c)," combinaciones de dos.\n");
@@ -377,6 +381,8 @@ end;
 
 
 
+
+
 CantidadDeGeneradores:= function (a,b,c)
 # Imprime el grupo y la cardinalidad de este, en caso de que el numero de generadores sea c.
     local i,j,Grupos,NumeroGeneradores,medida,x;
@@ -390,16 +396,19 @@ CantidadDeGeneradores:= function (a,b,c)
         for j in [1..medida] do
             if IsAbelian(Grupos[j])=false then
                 NumeroGeneradores:=Length(GeneratorsOfGroup(Grupos[j])); 
-                if  NumeroGeneradores=c then 
+#                if  NumeroGeneradores=c then 
                     PrintTo("/dev/tty"," No es abeliano   \n");          
                     PrintTo("/dev/tty","Grupos= ", j ,"   \n");
                     PrintTo("/dev/tty","--------------------  Numero de generadores = ", NumeroGeneradores,"   \n");
-                fi;  
+#                fi;  
             fi;
         od;
     od;
     return 0;
 end;
+
+
+
 
 EsGraficaDeCayley := function (g)
     local aut,cc,reps,l,esono,i;
@@ -409,7 +418,7 @@ EsGraficaDeCayley := function (g)
     else
         esono := false;
         cc := ConjugacyClassesSubgroups(aut);
-        reps := List(cc,x-x[1]);
+        reps := List(cc,x->x[1]);
         l := List([1..Length(reps)],x->[x,Order(reps[x])]);
         l := Filtered(l,x->x[2]=OrderGraph(g));
     fi;
