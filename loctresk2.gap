@@ -20,6 +20,21 @@ EliminaInversos:=function(l) # Elimina los inversos de una lista dada.
     return l1;
 end; 
 
+SubgruposAbelianos:=function(g)
+    local x,i,S;
+    S:=AllSubgroups(g);
+    
+x:=[];
+ for i in [1..Length(S)] do  
+ if IsAbelian(S[i])=true then
+ Add(x,S[i]);
+ fi;
+od;
+return Length(x);
+
+end;
+
+
 
 # a,b,c se suponen de orden 3
 ConjuntoTPrimero := function (a,b,c)    # Verifica que los elementos no cumplan las condiciones malas en caso del tipo uno. 
