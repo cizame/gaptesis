@@ -102,9 +102,55 @@ ConjuntoTSegundo := function (a,b) # Verifica que los elementos no cumplan con l
 
 end;
 
+#---------------------------------------------------------------------------
+
+
+
+
+OchoCiclosUno:=function (t)     
+    local q,w,e,r,a,b,c,l,l1;
+a:=t[1];
+if t[2]<>a*a then
+   b:=t[2];
+else
+   b:=t[3];
+fi;
+l:=[a,a^-1,b,b^-1];
+l1:=Filtered(t,x-> not x in l);
+c:=l1[1];
+     q:=a*b;
+     w:=a*b^-1;
+     e:=a*c;
+     r:=a*c^-1; 
+    if 
+       q=b*a or q=b*a^-1 or q=b*c or q=b*c^-1 or q= c*a or q=c*a^-1
+       or q=(c^-1)*a or q= (c^-1)*(a^-1) or q=(b^-1)*a or q=(b^-1)*(a^-1)
+       or q=(b^-1)*c or q=(b^-1)*(b^-1) then
+        return fail;
+    elif
+      w = b*a^-1 or w=b*c or w=b*c^-1 or w=(b^-1)*c or w=(b^-1)*(c^-1) 
+      or w=c*a^-1 or w=(c^-1)*(a^-1) then
+        return fail;
+    elif
+      e =b*a or e=(b^-1)*a or e= c*a or  e=(c)*a^-1 or e=c*b or e=c*b^-1 
+      or e= (c^-1)*(a)  or e= (c^-1)*(a^-1)  or e= (c^-1)*(b) or e= (c^-1)*(b^-1) then
+        return fail;
+    elif
+      r = c*a^-1 or r=c*b or r=c*b^-1 or r=(c^-1)*b or r=(c^-1)*(b^-1) then
+        return fail;
+    else
+        return 1;
+    fi;
+end;
+
+
+#------------------------------------------------------------------------
+
+
 ExaminaGrupoCondicionUno := function (g,CUELLO)  # Recibe un grupo
-    local i,c,c1,l,l1,t,tbuena,seis,aut,orbs,reps,OrdendeG,GrupoGenerado,Orden,g1;
-    g1:=Filtered(Elements(g), x-> not x in Centre(g));
+    local i,c,c1,l,l1,t,t1,tbuena,seis,aut,orbs,reps,reps1,OrdendeG,GrupoGenerado,Orden,g1,sinc;
+ 
+   g1:=Filtered(Elements(g), x-> not x in Centre(g));
     l := Filtered(Elements(g1),x->Order(x)=3);
     l1:=EliminaInversos(l);
     c1 := Combinations(l1,3);
@@ -120,7 +166,7 @@ ExaminaGrupoCondicionUno := function (g,CUELLO)  # Recibe un grupo
     od;
 
     # Print("l = ",Length(l),"l1 = ",Length(l1), " \n");
-    #   Print("Hay ",Length(c)," combinaciones de tres.\n");
+ #      Print("Hay ",Length(c)," combinaciones de tres.\n");
     aut := AutomorphismGroup(g);
     # Print("Ya  calcule los automorfismos \n");
     orbs := Orbits(aut,c,OnSets);
@@ -128,8 +174,6 @@ ExaminaGrupoCondicionUno := function (g,CUELLO)  # Recibe un grupo
     reps := List(orbs,x->x[1]);    
     tbuena :=[];
     # Print("Hay ",Length(reps)," orbitas de combinaciones de tres.\n");
-
-
 
 
     for i in [1..Length(reps)] do
@@ -147,9 +191,22 @@ ExaminaGrupoCondicionUno := function (g,CUELLO)  # Recibe un grupo
     #Print("Voy a calcular orbitas.\n");
     orbs := Orbits(aut,tbuena,OnSets);
     reps := List(orbs,x->x[1]);
+#Print("Hay  ", Length(reps[1]) ," en la lista.\n");
+reps1:=[];
 
 
-    return List(reps,x->CayleyGraph(g,x));
+
+for i in [1..Length(reps)] do
+        t1 := reps[i];
+#Print("t1            ", t1 ,"\n");
+        sinc := OchoCiclosUno(t1);
+        if sinc <> fail then
+            Add(reps1,t1);
+        fi;
+    od;
+Print("Hay  ", Length(reps) ," combinaciones buenas despues de calcular orbitas.\n");
+ Print("Hay  ", Length(reps1) ," combinaciones buenas sin ciclos de 8.\n");
+    return List(reps1,x->CayleyGraph(g,x));
 end;
 
 
@@ -233,7 +290,7 @@ end;
 #
 ListadeGraficasUno:= function(l,grupo,CUELLO)
     local i,j,t,cuello,b;
-
+ #   Print("Manda llamar condicion uno \n");
     t:= ExaminaGrupoCondicionUno(l,CUELLO);
 
     if Length(t)<>0 then
@@ -242,7 +299,7 @@ ListadeGraficasUno:= function(l,grupo,CUELLO)
             b:= GraficaDePuntosYTriangulos(t[j]);
             #  PrintTo("/dev/tty","Voy en la grafica = ",i,"     \r");
             cuello:= Girth(b);
-
+              
             if cuello > (CUELLO-1) then
 
                 PrintTo("/dev/tty","-----Cuello de la grafica ",j," =             ",cuello,"      Cond  1,   grupo ",grupo,"   \n");
@@ -321,40 +378,38 @@ ParaExaminarGrupos:= function(a,b,CUELLO,gen) # Recibe el intervalo a revisar y 
 
 
     for i in [a..b] do
-        #PrintTo("/dev/tty","cardinalidad del grupo = ",i,"   \n");
+        PrintTo("/dev/tty","Orden del grupo = ",i,"   \n");
         k:=1;
         Grupos:=AllGroups(i);  #Calcula todos los grupos de orden i.
         medida:=Length(Grupos); 
         x:=[];
         y:=[];
-        # PrintTo("/dev/tty"," --medida del grupo ",medida,"------------  \n");
+#        PrintTo("/dev/tty"," --medida del grupo ",medida,"------------  \n");
 
         for j in [1..medida] do 
 
-            # if k=10 then PrintTo("/dev/tty"," ------ Voy en el grupo ",j,"------------  \n"); k:=0 ; fi; k:=k+1; 
+         #    if k=10 then PrintTo("/dev/tty"," ------ Voy en el grupo ",j,"------------  \n"); k:=0 ; fi; k:=k+1; 
 
             if IsAbelian(Grupos[j])=false then           # Si el grupo es abeliano lo descarta pues el cuello seria ocho. 
                 NumeroGeneradores:=Length(GeneratorsOfGroup(Grupos[j]));      
 
-                #                    if  NumeroGeneradores=3 and (i mod 3=0) then 
+                   if  (i mod 3=0) then 
+# La grafica no es conexa si el numero minimo de generadores es mayor a dos en $Cay(G,T)$ del tipo uno, y mayor a tres en el caso del tipo dos.  
+                                Add(x,j);
+                      fi;  
 
-
-                # La grafica no es conexa si el numero de generadores es mayor a dos en $Cay(G,T)$ del tipo uno, y mayor a tres en el caso del tipo dos.  
-                #                           Add(x,j);
-                #                    fi;  
-
-                if  NumeroGeneradores>gen then                
-                    Add(y,j);
+                if  NumeroGeneradores>gen then    
+                     Add(y,j);
                 fi;  
 
             fi;
         od;
 
-
-        PrintTo("/dev/tty","  Orden del grupo", i ,"   \n");
+  #      Print("  med x ", Length(x),"   \n");
         for k1 in [1..Length(x)] do
-            # PrintTo("/dev/tty","   Condicion uno   \n");
-            #CondicionUno:=ListadeGraficasUno(Grupos[x[k1]],x[k1],CUELLO);   # Cay(G,T) condicion uno
+ #            PrintTo("/dev/tty","   Condicion uno   \n");
+ if k1 mod 3=0 then PrintTo("/dev/tty"," ------ Voy en el grupo ",k1,"------------  \n"); fi; 
+            CondicionUno:=ListadeGraficasUno(Grupos[x[k1]],x[k1],CUELLO);   # Cay(G,T) condicion uno
         od;      
 
 
@@ -427,4 +482,4 @@ end;
 
 
 
-
+# L := List(AllSmallGroups(32),G->Size(Subgroups(G)));
