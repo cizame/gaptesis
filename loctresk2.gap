@@ -21,13 +21,12 @@ EliminaInversos:=function(l) # Elimina los inversos de una lista dada.
 end; 
 
 
-SubgruposAbelianos:=function(g)
+SubgruposCiclicos:=function(g,cuello)
     local x,i,S;
-    S:=AllSubgroups(g);
-    
+    S:=AllSubgroups(g);    
     x:=[];    
  for i in [1..Length(S)] do  
-   if IsAbelian(S[i])=true then
+   if IsCyclic(S[i])=true and cuello>=Order(S[i]) then
      Add(x,S[i]);
    fi;
 od;
@@ -40,7 +39,6 @@ Interseccion:=function(x)
     
     local X1,i,j,a,b;
     X1:=[];
-     
     a:=((Length(x)+1)*(Length(x)))/2;
     PrintTo("/dev/tty","Numero de parejas = ",a,"   \n");
     for i in [1..(Length(x)-1)] do 
@@ -48,14 +46,12 @@ Interseccion:=function(x)
             b:=Intersection(x[i],x[j]);
             
              if 1=(Order(b)) then
-                 Add(X1,x[i]);
+                 Add(X1,[x[i],x[j]]);
              fi; 
          od;       
      od;
-     
-    
-    return Length(X1);
-    
+         
+    return Length(X1);   
 end;
 
 
