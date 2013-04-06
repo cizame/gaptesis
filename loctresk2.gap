@@ -26,7 +26,7 @@ SubgruposCiclicos:=function(g,cuello)
     S:=AllSubgroups(g);    
     x:=[];    
  for i in [1..Length(S)] do  
-   if IsCyclic(S[i])=true and cuello>=Order(S[i]) then
+   if IsCyclic(S[i])=true and cuello<=Order(S[i]) then
      Add(x,S[i]);
    fi;
 od;
