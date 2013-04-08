@@ -25,7 +25,7 @@ SubgruposCiclicos:=function(g,cuello)
     local x,i,S;
     S:=AllSubgroups(g);    
     x:=[];    
- for i in [1..Length(S)] do  
+ for i in [2..(Length(S)-1)] do  
    if IsCyclic(S[i])=true and cuello<=Order(S[i]) then
      Add(x,S[i]);
    fi;
@@ -37,20 +37,30 @@ end;
 
 Interseccion:=function(x)
     
-    local X1,i,j,a,b;
+    local X1,i,j,a,b,b1,b2,cont;
     X1:=[];
-    a:=((Length(x)+1)*(Length(x)))/2;
-    PrintTo("/dev/tty","Numero de parejas = ",a,"   \n");
+    cont:=0;
+    
+    a:=((Length(x)-1)*(Length(x)))/2;
+    PrintTo("/dev/tty","Numero de parejas = ",a," y medida de x ",Length(x),"   \n");
     for i in [1..(Length(x)-1)] do 
         for j in [(i+1)..Length(x)] do
-            b:=Intersection(x[i],x[j]);
-            
-             if 1=(Order(b)) then
-                 Add(X1,[x[i],x[j]]);
-             fi; 
-         od;       
+            if i<>j then
+                cont:=cont+1;
+                
+                b1:=IsSubgroup(x[i],x[j]);
+                b2:=IsSubgroup(x[i],x[j]);
+                if b1=false and b2=false then
+                    b:=Intersection(x[i],x[j]);
+                    if 1=(Order(b)) then
+                        Add(X1,[x[i],x[j]]);
+                    fi;
+                fi; 
+            fi;
+        od;       
      od;
-         
+        
+   PrintTo("/dev/tty","Entra  ",cont," veces  \n"); 
     return Length(X1);   
 end;
 
