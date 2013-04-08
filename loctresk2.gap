@@ -69,30 +69,34 @@ Interseccion:=function(x)
 end;
 
 
-min:=function(X1)
-    local i,j,gen1,gen2,orden,ord,g1,g2;
+ParejasDeSubgrupos:=function(X1,orde)
+    local i,j,gen1,gen2,orden,ord,g1,g2,orden1;
     gen1:=[];
     gen2:=[];
-    orden:=0;
+    orden1:=0;
     ord:=0;
     
     for i in [1..Length(X1)] do
         g1:=GeneratorsSmallest(X1[i][1]);  
         g2:=GeneratorsSmallest(X1[i][2]); 
           
-       if g1*g2<>g2*g1 then    
-        Add(gen1,g1);  
-        Add(gen2,g2);   
-    fi;    
+        if g1*g2<>g2*g1 then
+              PrintTo("/dev/tty","esto es g1 ",g1,"  \n"); 
+            orden:=Group([g1,g2]);
+           PrintTo("/dev/tty","esto es g2 ",g2,"  \n");
+            if orde=Order(orden) then   
+               Add(gen1,g1);  
+                Add(gen2,g2);
+            fi;
+        fi;    
     od;
     
     
     for j in [1..Length(gen1)] do
-          orden:=orden+(Order(Group(gen1[j]))*Order(Group(gen2[j])));      
-    #    ord:=ord+(Order(X1[j][1])*Order(X1[j][2]));
+          orden1:=orden1+(Order(Group(gen1[j]))*Order(Group(gen2[j])));      
     od;
     
-    PrintTo("/dev/tty","Cantidad de parejas ",orden,"  \n"); 
+    PrintTo("/dev/tty","Cantidad de parejas ",orden1,"  \n"); 
     
     return 0;
     
@@ -289,16 +293,30 @@ end;
 
 
 
+
+
+
+
+
 # Para examinar la condicion dos
 
 ExaminaGrupoCondicionDos := function (g,CUELLO)
-    local i,c,c1,l,t,tbuena,seis,aut,orbs,reps,Orden,GrupoGenerado,OrdendeG,CUEllo,aux,g1;
-    CUEllo:=CUELLO/2-1;   
-    g1:=Filtered(Elements(g), x-> not x in Centre(g));
+    local i,c,c1,l,t,tbuena,seis,aut,orbs,reps,Orden,GrupoGenerado,OrdendeG,CUEllo,aux,g1,Subgrupos,Inter,min;
+     OrdendeG:=Order(g);
+    Subgrupos:=SubgruposCiclicos(g,CUELLO);
+    Inter:=Interseccion(Subgrupos);
+    min:=ParejasDeSubgrupos(Inter,OrdendeG);
     
-    l := Filtered (Elements(g1),x-> Order(x)>CUEllo);
+    
+    
+ #   g1:=Filtered(Elements(g), x-> not x in Centre(g));
+    
+ #   l := Filtered (Elements(g1),x-> Order(x)>=CUELLO/2);
+    
+    
     c1 := Combinations(l,2);
-    OrdendeG:=Order(g);
+    
+   
     c:=[];
 
     for i in [1..Length(c1)] do 
