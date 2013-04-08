@@ -26,10 +26,12 @@ SubgruposCiclicos:=function(g,cuello)
     S:=AllSubgroups(g);    
     x:=[];    
  for i in [2..(Length(S)-1)] do  
-   if IsCyclic(S[i])=true and cuello<=Order(S[i]) then
+   if IsCyclic(S[i])=true and ((cuello)/2)<=(Order(S[i])) then
      Add(x,S[i]);
    fi;
 od;
+ PrintTo("/dev/tty","Numero de parejas que se formarian = ", (Order(g)-1)*(Order(g)-2),"   \n");
+
 return x;
 
 end;
@@ -39,14 +41,14 @@ Interseccion:=function(x)
     
     local X1,i,j,a,b,b1,b2,cont;
     X1:=[];
-    cont:=0;
+   # cont:=0;
     
     a:=((Length(x)-1)*(Length(x)))/2;
-    PrintTo("/dev/tty","Numero de parejas = ",a," y medida de x ",Length(x),"   \n");
+ #   PrintTo("/dev/tty","Numero de parejas = ",a," y medida de x ",Length(x),"   \n");
     for i in [1..(Length(x)-1)] do 
         for j in [(i+1)..Length(x)] do
             if i<>j then
-                cont:=cont+1;
+  #              cont:=cont+1;
                 
                 b1:=IsSubgroup(x[i],x[j]);
                 b2:=IsSubgroup(x[i],x[j]);
@@ -58,14 +60,45 @@ Interseccion:=function(x)
                 fi; 
             fi;
         od;       
-     od;
+    od;
+    
+     PrintTo("/dev/tty"," Cantidad de parejas de grupos ",Length(X1),"  \n"); 
         
-   PrintTo("/dev/tty","Entra  ",cont," veces  \n"); 
-    return Length(X1);   
+
+    return (X1);   
 end;
 
 
+min:=function(X1)
+    local i,j,gen1,gen2,orden,ord,g1,g2;
+    gen1:=[];
+    gen2:=[];
+    orden:=0;
+    ord:=0;
+    
+    for i in [1..Length(X1)] do
+        g1:=GeneratorsSmallest(X1[i][1]);  
+        g2:=GeneratorsSmallest(X1[i][2]); 
+          
+       if g1*g2<>g2*g1 then    
+        Add(gen1,g1);  
+        Add(gen2,g2);   
+    fi;    
+    od;
+    
+    
+    for j in [1..Length(gen1)] do
+          orden:=orden+(Order(Group(gen1[j]))*Order(Group(gen2[j])));      
+    #    ord:=ord+(Order(X1[j][1])*Order(X1[j][2]));
+    od;
+    
+    PrintTo("/dev/tty","Cantidad de parejas ",orden,"  \n"); 
+    
+    return 0;
+    
+end;
 
+    
 # a,b,c se suponen de orden 3
 ConjuntoTPrimero := function (a,b,c)    # Verifica que los elementos no cumplan las condiciones malas en caso del tipo uno. 
     local l;
