@@ -70,24 +70,33 @@ end;
 
 
 ParejasDeSubgrupos:=function(X1,orden)
-    local i,j,gen1,gen2,G,ord,g1,g2,orden1,aux;
+    local i,j,gen1,gen2,G,ord,g1,g2,orden1,aux,list1,list2;
     gen1:=[];
     gen2:=[];
     orden1:=0;
     ord:=0;
     
     for i in [1..Length(X1)] do
-        g1:=GeneratorsSmallest(X1[i][1]);  
-        g2:=GeneratorsSmallest(X1[i][2]); 
-        if Length(g1)>1 or Length(g2)>1 then
-           PrintTo("/dev/tty","------ERROR ----- la pareja de grupos  ciclico tiene ",Length(g1)," y ",Length(g2)," generadores  \n"); 
-        fi;
+        list1:=Filtered(Elements(X1[i][1]),x->Order(x)=Order(X1[i][1]));
+        list2:=Filtered(Elements(X1[i][2]),x->Order(x)=Order(X1[i][2]));
+      
+        g1:=list1[1];  
+        g2:=list2[1]; 
+                if Order(X1[i][1])=Order(Group(g1)) then
+                    PrintTo("/dev/tty","Los ordenes del grupo 1 coinciden  \n");
+                else
+                     PrintTo("/dev/tty","**OTRO ERROR** Los ordenes de g1 NO  coinciden  \n");
+                 fi;
+                
+                 if Order(X1[i][2])=Order(Group(g2)) then
+                    PrintTo("/dev/tty","Los ordenes del grupo 2 coinciden  \n");
+                else
+                     PrintTo("/dev/tty","**OTRO ERROR** Los ordenes de g2 NO  coinciden  \n");
+                fi;          
         
-        if g1[1]*g2[1]<>g2[1]*g1[1] then
-              G:=Group(g1[1],g2[1]);
-              aux:=Order(G);
-              
-           
+        if g1*g2<>g2*g1 then
+              G:=Group(g1,g2);
+              aux:=Order(G);           
             if orden = aux then   
                Add(gen1,g1);  
                 Add(gen2,g2);
