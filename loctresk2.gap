@@ -82,17 +82,17 @@ ParejasDeSubgrupos:=function(X1,orden)
       
         g1:=list1[1];  
         g2:=list2[1]; 
-                if Order(X1[i][1])=Order(Group(g1)) then
-                    PrintTo("/dev/tty","Los ordenes del grupo 1 coinciden  \n");
-                else
-                     PrintTo("/dev/tty","**OTRO ERROR** Los ordenes de g1 NO  coinciden  \n");
-                 fi;
+ #               if Order(X1[i][1])=Order(Group(g1)) then
+ #                   PrintTo("/dev/tty","Los ordenes del grupo 1 coinciden  \n");
+#                else
+#                     PrintTo("/dev/tty","**OTRO ERROR** Los ordenes de g1 NO  coinciden  \n");
+#                 fi;
                 
-                 if Order(X1[i][2])=Order(Group(g2)) then
-                    PrintTo("/dev/tty","Los ordenes del grupo 2 coinciden  \n");
-                else
-                     PrintTo("/dev/tty","**OTRO ERROR** Los ordenes de g2 NO  coinciden  \n");
-                fi;          
+#                 if Order(X1[i][2])=Order(Group(g2)) then
+#                    PrintTo("/dev/tty","Los ordenes del grupo 2 coinciden  \n");
+#                else
+#                     PrintTo("/dev/tty","**OTRO ERROR** Los ordenes de g2 NO  coinciden  \n");
+#                fi;          
         
         if g1*g2<>g2*g1 then
               G:=Group(g1,g2);
