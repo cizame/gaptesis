@@ -30,7 +30,7 @@ SubgruposCiclicos:=function(g,cuello)
      Add(x,S[i]);
    fi;
 od;
- PrintTo("/dev/tty","Numero de parejas que se formarian = ", (Order(g)-1)*(Order(g)-2),"   \n");
+ #PrintTo("/dev/tty","Numero de parejas que se formarian = ", (Order(g)-1)*(Order(g)-2),"   \n");
 
 return x;
 
@@ -62,17 +62,16 @@ Interseccion:=function(x)
         od;       
     od;
     
-     PrintTo("/dev/tty"," Cantidad de parejas de grupos ",Length(X1),"  \n"); 
+     #PrintTo("/dev/tty"," Cantidad de parejas de grupos ",Length(X1),"  \n"); 
         
 
-    return (X1);   
+    return X1;   
 end;
 
 
 ParejasDeSubgrupos:=function(X1,orden)
-    local i,j,gen1,gen2,G,ord,g1,g2,orden1,aux,list1,list2;
-    gen1:=[];
-    gen2:=[];
+    local i,j,c,G,ord,g1,g2,orden1,aux,list1,list2;
+    c:=[];
     orden1:=0;
     ord:=0;
     
@@ -98,20 +97,12 @@ ParejasDeSubgrupos:=function(X1,orden)
               G:=Group(g1,g2);
               aux:=Order(G);           
             if orden = aux then   
-               Add(gen1,g1);  
-                Add(gen2,g2);
+               Add(c,[g1,g2]);  
             fi;
         fi;    
     od;
     
-    
-    for j in [1..Length(gen1)] do
-          orden1:=orden1+(Order(Group(gen1[j]))*Order(Group(gen2[j])));      
-    od;
-    
-    PrintTo("/dev/tty","Cantidad de parejas ",orden1,"  \n"); 
-    
-    return 0;
+    return c;
     
 end;
 
@@ -314,36 +305,27 @@ end;
 # Para examinar la condicion dos
 
 ExaminaGrupoCondicionDos := function (g,CUELLO)
-    local i,c,c1,l,t,tbuena,seis,aut,orbs,reps,Orden,GrupoGenerado,OrdendeG,CUEllo,aux,g1,Subgrupos,Inter,min;
+    local j,i,k,c,c1,l,t,tbuena,seis,aut,orbs,reps,Orden,GrupoGenerado,OrdendeG,CUEllo,aux,Subgrupos,Inter,min,g1,g2;
      OrdendeG:=Order(g);
     Subgrupos:=SubgruposCiclicos(g,CUELLO);
     Inter:=Interseccion(Subgrupos);
     min:=ParejasDeSubgrupos(Inter,OrdendeG);
     
-    
-    
+    c:=[];
+   Print("Ya tengo las parejas de generadores.\n");
  #   g1:=Filtered(Elements(g), x-> not x in Centre(g));
     
  #   l := Filtered (Elements(g1),x-> Order(x)>=CUELLO/2);
-    
-    
-    c1 := Combinations(l,2);
-    
-   
-    c:=[];
-
-    for i in [1..Length(c1)] do 
-     
-        #    aux:=List(c1[i]);      ......../////////////......................//////////////////////////....................////////////
-        if not c1[i][1] in Centralizer(g,c1[i][2]) then 
-        GrupoGenerado:=Group(c1[i]);    
-        Orden:=Order(GrupoGenerado); 
-        if Orden = OrdendeG then  
-#            Print("///////////////////Prueba c[i][j] ", c1[i][1], " y ", c1[i][2]);
-            Add(c,c1[i]);
-        fi;
-        fi; 
+    for k in [1..Length(min)] do
+      g1:=Elements(Group(min[k][1]));
+      g2:=Elements(Group(min[k][2]));
+      for i in [2..Length(g1)] do
+          for j in [2..Length(g2)] do
+            Add(c,[g1[i],g2[j]]); 
+          od; 
+      od;      
     od;
+    Print("Ya tengo las parejas a checar.\n");
 
     #Print("Hay ",Length(c)," combinaciones de dos.\n");
     aut := AutomorphismGroup(g);
@@ -482,7 +464,7 @@ end;
 
 
 #
-ParaExaminarGrupos:= function(a,b,CUELLO,gen) # Recibe el intervalo a revisar y el cuello minimo a buscar.
+ParaExaminarGrupos:= function(a,b,CUELLO) # Recibe el intervalo a revisar y el cuello minimo a buscar.
     local i,j,Grupos,CondicionUno, CondicionDos,k,medida,x,y,MedidaDex,NumeroGeneradores,k1,k2;
 
 
@@ -506,19 +488,16 @@ ParaExaminarGrupos:= function(a,b,CUELLO,gen) # Recibe el intervalo a revisar y 
 # La grafica no es conexa si el numero minimo de generadores es mayor a dos en $Cay(G,T)$ del tipo uno, y mayor a tres en el caso del tipo dos.  
                                 Add(x,j);
                       fi;  
-
-                if  NumeroGeneradores>gen then    
+   
                      Add(y,j);
-                fi;  
-
             fi;
         od;
 
   #      Print("  med x ", Length(x),"   \n");
         for k1 in [1..Length(x)] do
  #            PrintTo("/dev/tty","   Condicion uno   \n");
- if k1 mod 3=0 then PrintTo("/dev/tty"," ------ Voy en el grupo ",k1,"------------  \n"); fi; 
-            CondicionUno:=ListadeGraficasUno(Grupos[x[k1]],x[k1],CUELLO);   # Cay(G,T) condicion uno
+ #       if k1 mod 3=0 then PrintTo("/dev/tty"," ------ Voy en el grupo ",k1,"------------  \n"); fi; 
+  #          CondicionUno:=ListadeGraficasUno(Grupos[x[k1]],x[k1],CUELLO);   # Cay(G,T) condicion uno
         od;      
 
 
