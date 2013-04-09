@@ -69,8 +69,8 @@ Interseccion:=function(x)
 end;
 
 
-ParejasDeSubgrupos:=function(X1,orde)
-    local i,j,gen1,gen2,orden,ord,g1,g2,orden1;
+ParejasDeSubgrupos:=function(X1,orden)
+    local i,j,gen1,gen2,G,ord,g1,g2,orden1,aux;
     gen1:=[];
     gen2:=[];
     orden1:=0;
@@ -79,12 +79,16 @@ ParejasDeSubgrupos:=function(X1,orde)
     for i in [1..Length(X1)] do
         g1:=GeneratorsSmallest(X1[i][1]);  
         g2:=GeneratorsSmallest(X1[i][2]); 
-          
-        if g1*g2<>g2*g1 then
-              PrintTo("/dev/tty","esto es g1 ",g1,"  \n"); 
-            orden:=Group([g1,g2]);
-           PrintTo("/dev/tty","esto es g2 ",g2,"  \n");
-            if orde=Order(orden) then   
+        if Length(g1)>1 or Length(g2)>1 then
+           PrintTo("/dev/tty","------ERROR ----- la pareja de grupos  ciclico tiene ",Length(g1)," y ",Length(g2)," generadores  \n"); 
+        fi;
+        
+        if g1[1]*g2[1]<>g2[1]*g1[1] then
+              G:=Group(g1[1],g2[1]);
+              aux:=Order(G);
+              
+           
+            if orden = aux then   
                Add(gen1,g1);  
                 Add(gen2,g2);
             fi;
