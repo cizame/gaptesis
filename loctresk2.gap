@@ -30,7 +30,7 @@ SubgruposCiclicos:=function(g,cuello)
      Add(x,S[i]);
    fi;
 od;
- #PrintTo("/dev/tty","Numero de parejas que se formarian = ", (Order(g)-1)*(Order(g)-2),"   \n");
+ PrintTo("/dev/tty","Numero de parejas que se formarian = ", (Order(g)-1)*(Order(g)-2),"   \n");
 
 return x;
 
@@ -39,30 +39,33 @@ end;
 
 Interseccion:=function(x)
     
-    local X1,i,j,a,b,b1,b2,cont;
+    local X1,i,j,a,b,b1,b2,cont,c;
     X1:=[];
    # cont:=0;
     
     a:=((Length(x)-1)*(Length(x)))/2;
- #   PrintTo("/dev/tty","Numero de parejas = ",a," y medida de x ",Length(x),"   \n");
-    for i in [1..(Length(x)-1)] do 
-        for j in [(i+1)..Length(x)] do
-            if i<>j then
+    PrintTo("/dev/tty","Numero de parejas = ",a," y medida de x ",Length(x),"   \n");
+    
+    c:=Combinations(x,2);
+    
+    for i in [1..(Length(c))] do 
+#        for j in [(i+1)..Length(x)] do
+#            if i<>j then
   #              cont:=cont+1;
                 
-                b1:=IsSubgroup(x[i],x[j]);
-                b2:=IsSubgroup(x[i],x[j]);
+                b1:=IsSubgroup(c[i][1],c[i][2]);
+                b2:=IsSubgroup(c[i][2],c[i][1]);
                 if b1=false and b2=false then
-                    b:=Intersection(x[i],x[j]);
+                    b:=Intersection(c[i][1],c[i][2]);
                     if 1=(Order(b)) then
-                        Add(X1,[x[i],x[j]]);
+                        Add(X1,[c[i][1],c[i][2]]);
                     fi;
                 fi; 
-            fi;
-        od;       
+#            fi;
+#        od;       
     od;
     
-     #PrintTo("/dev/tty"," Cantidad de parejas de grupos ",Length(X1),"  \n"); 
+     PrintTo("/dev/tty"," Cantidad de parejas de grupos ",Length(X1),"  \n"); 
         
 
     return X1;   
@@ -312,7 +315,7 @@ ExaminaGrupoCondicionDos := function (g,CUELLO)
     min:=ParejasDeSubgrupos(Inter,OrdendeG);
     
     c:=[];
-   Print("Ya tengo las parejas de generadores.\n");
+#   Print("Ya tengo las parejas de generadores.\n");
  #   g1:=Filtered(Elements(g), x-> not x in Centre(g));
     
  #   l := Filtered (Elements(g1),x-> Order(x)>=CUELLO/2);
@@ -320,21 +323,37 @@ ExaminaGrupoCondicionDos := function (g,CUELLO)
       g1:=Elements(Group(min[k][1]));
       g2:=Elements(Group(min[k][2]));
       for i in [2..Length(g1)] do
+          if Order(g1[i])<>3 then
+              
           for j in [2..Length(g2)] do
-            Add(c,[g1[i],g2[j]]); 
+             if Order(g2[j])<>3 then
+              c1:=[g1[i],g2[j]];
+                  Add(c,Set(c1));
+              fi;
+              
           od; 
+      fi;
+      
       od;      
-    od;
-    Print("Ya tengo las parejas a checar.\n");
-
-    #Print("Hay ",Length(c)," combinaciones de dos.\n");
+  od;
+  
+  # Print("Esto es c antes de set",c,".\n");
+ # c:=Set(c);
+  
+  # Print("Esto es c",c,".\n");
+ #   Print("Ya tengo las parejas a checar. es set?",IsSet(c),".\n");
+#    if Length(c)=0 then
+  #   reps:=[];       
+#        return List(reps,x->CayleyGraph(g,x));
+#    else    
+#    Print("Hay ",Length(c)," combinaciones de dos.\n");
     aut := AutomorphismGroup(g);
-    # Print("Ya  calcule los automorfismos \n");
+#     Print("Ya  calcule los automorfismos \n");
     orbs := Orbits(aut,c,OnSets);
-    #Print("Ya  calcule las orbitas \n");
+#    Print("Ya  calcule las orbitas \n");
     reps := List(orbs,x->x[1]);    
     tbuena :=[];
-    # Print("Hay ",Length(reps)," orbitas combinaciones de dos.\n");
+#     Print("Hay ",Length(reps)," orbitas combinaciones de dos.\n");
     for i in [1..Length(reps)] do
         t := reps[i];
         #   PrintTo("/dev/tty","Voy en la combinacion = ",i,"     \r");
@@ -353,6 +372,8 @@ ExaminaGrupoCondicionDos := function (g,CUELLO)
     ################################################################################# Print("tbuena=.", orbs,"\n");
 
     return List(reps,x->CayleyGraph(g,x));
+#fi;
+
 end;
 
 
