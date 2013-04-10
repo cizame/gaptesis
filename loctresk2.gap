@@ -30,7 +30,7 @@ SubgruposCiclicos:=function(g,cuello)
      Add(x,S[i]);
    fi;
 od;
- PrintTo("/dev/tty","Numero de parejas que se formarian = ", (Order(g)-1)*(Order(g)-2),"   \n");
+# PrintTo("/dev/tty","Numero de parejas que se formarian = ", (Order(g)-1)*(Order(g)-2),"   \n");
 
 return x;
 
@@ -65,7 +65,7 @@ Interseccion:=function(x)
 #        od;       
     od;
     
-     PrintTo("/dev/tty"," Cantidad de parejas de grupos ",Length(X1),"  \n"); 
+ #    PrintTo("/dev/tty"," Cantidad de parejas de grupos ",Length(X1),"  \n"); 
         
 
     return X1;   
@@ -104,7 +104,7 @@ ParejasDeSubgrupos:=function(X1,orden)
             fi;
         fi;    
     od;
-    
+     PrintTo("/dev/tty","Cantidad de parejas de subgrupos valida ",Length(c),"  \n");
     return c;
     
 end;
@@ -341,11 +341,11 @@ ExaminaGrupoCondicionDos := function (g,CUELLO)
  # c:=Set(c);
   
   # Print("Esto es c",c,".\n");
- #   Print("Ya tengo las parejas a checar. es set?",IsSet(c),".\n");
-#    if Length(c)=0 then
-  #   reps:=[];       
-#        return List(reps,x->CayleyGraph(g,x));
-#    else    
+   Print("Ya tengo las parejas a checar y son ",Length(c),".\n");
+    if Length(c)=0 then
+     reps:=[];       
+        return List(reps,x->CayleyGraph(g,x));
+    else    
 #    Print("Hay ",Length(c)," combinaciones de dos.\n");
     aut := AutomorphismGroup(g);
 #     Print("Ya  calcule los automorfismos \n");
@@ -353,7 +353,7 @@ ExaminaGrupoCondicionDos := function (g,CUELLO)
 #    Print("Ya  calcule las orbitas \n");
     reps := List(orbs,x->x[1]);    
     tbuena :=[];
-#     Print("Hay ",Length(reps)," orbitas combinaciones de dos.\n");
+     Print("Despues de orbitas hay ", Length(reps),"  combinaciones de dos.\n");
     for i in [1..Length(reps)] do
         t := reps[i];
         #   PrintTo("/dev/tty","Voy en la combinacion = ",i,"     \r");
@@ -362,17 +362,19 @@ ExaminaGrupoCondicionDos := function (g,CUELLO)
             Add(tbuena,seis);
         fi;
     od;
-    # PrintTo("/dev/tty","\n");
+    PrintTo("/dev/tty","------Hay ",Length(tbuena)," combinaciones buenas \n");
 
     #Print("Voy a quitar repeticiones.\n");
     tbuena := Set(tbuena,Set);
 
     orbs := Orbits(aut,tbuena,OnSets);
     reps := List(orbs,x->x[1]);
-    ################################################################################# Print("tbuena=.", orbs,"\n");
+    #################################################################################
+    
+    Print("Hay tbuena despues de orbitas = ", Length(reps),"\n");
 
     return List(reps,x->CayleyGraph(g,x));
-#fi;
+fi;
 
 end;
 
