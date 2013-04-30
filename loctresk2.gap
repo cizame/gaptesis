@@ -56,16 +56,16 @@ Interseccion:=function(x)
                 b1:=IsSubgroup(c[i][1],c[i][2]);
                 b2:=IsSubgroup(c[i][2],c[i][1]);
                 if b1=false and b2=false then
-                    b:=Intersection(c[i][1],c[i][2]);
-                    if 0<(Order(b)) then
+#                    b:=Intersection(c[i][1],c[i][2]);
+ #                   if 0<(Order(b)) then
                         Add(X1,[c[i][1],c[i][2]]);
-                    fi;
+  #                  fi;
                 fi; 
 #            fi;
 #        od;       
     od;
     
- #    PrintTo("/dev/tty"," Cantidad de parejas de grupos ",Length(X1),"  \n"); 
+    PrintTo("/dev/tty"," Cantidad de parejas de grupos ",Length(X1),"  \n"); 
         
 
     return X1;   
@@ -104,7 +104,7 @@ ParejasDeSubgrupos:=function(X1,orden)
             fi;
         fi;    
     od;
-#     PrintTo("/dev/tty","Cantidad de parejas de subgrupos valida ",Length(c),"  \n");
+     PrintTo("/dev/tty","Cantidad de parejas de subgrupos valida ",Length(c),"  \n");
     return c;
     
 end;
@@ -328,13 +328,18 @@ ExaminaGrupoCondicionDos := function (g,CUELLO)
           for j in [2..Length(g2)] do
              if Order(g2[j])<>3 and  Order(g2[j])>=CUELLO/2 then
                  c1:=[g1[i],g2[j]];
-                 if Length(Set(c1))=2 then
+                 c1:=Set(c1);
+                 
+                 if Length(c1)=2 then
        #                 PrintTo("/dev/tty","^^^^Error la medida de c1 es = ",Length(c1),"     \n");
                  
-                     
-                        Add(c,Set(c1));
+                     if c1[1]*c1[2]<>c1[2]*c1[1] then
+                         if Order(Group(c1))=OrdendeG then
+                             Add(c,c1);
+                         fi;                         
                     fi;
-                    
+                fi;
+                
               fi;
               
           od; 
@@ -347,7 +352,7 @@ ExaminaGrupoCondicionDos := function (g,CUELLO)
  # c:=Set(c);
   
   # Print("Esto es c",c,".\n");
-#   Print("Ya tengo las parejas a checar y son ",Length(c),".\n");
+   Print("Ya tengo las parejas a checar y son ",Length(c),".\n");
     if Length(c)=0 then
      reps:=[];       
         return List(reps,x->CayleyGraph(g,x));
@@ -371,7 +376,7 @@ ExaminaGrupoCondicionDos := function (g,CUELLO)
             Add(tbuena,seis);
         fi;
     od;
- #   PrintTo("/dev/tty","------Hay ",Length(tbuena)," combinaciones buenas \n");
+    PrintTo("/dev/tty","------Hay ",Length(tbuena)," combinaciones buenas \n");
 
     #Print("Voy a quitar repeticiones.\n");
     tbuena := Set(tbuena,Set);
@@ -380,7 +385,7 @@ ExaminaGrupoCondicionDos := function (g,CUELLO)
     reps := List(orbs,x->x[1]);
     #################################################################################
     
-#    Print("Hay tbuena despues de orbitas = ", Length(reps),"\n");
+   Print("Hay tbuena despues de orbitas = ", Length(reps),"\n");
 
     return List(reps,x->CayleyGraph(g,x));
 fi;
