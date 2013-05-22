@@ -20,101 +20,80 @@ EliminaInversos:=function(l) # Elimina los inversos de una lista dada.
     return l1;
 end; 
 
-
+# regresa una lista con los subgrupos cíclicos de g de tamaño menor o
+# igual a cuello/2
 SubgruposCiclicos:=function(g,cuello)
     local x,i,S;
     S:=AllSubgroups(g);    
     x:=[];    
- for i in [1..(Length(S))] do  
-   if IsCyclic(S[i])=true and ((cuello)/2)<=(Order(S[i])) then
-     Add(x,S[i]);
-   fi;
-od;
+    for i in [1..(Length(S))] do  
+        if IsCyclic(S[i])=true and ((cuello)/2)<=(Order(S[i])) then
+            Add(x,S[i]);
+        fi;
+    od;
 # PrintTo("/dev/tty","Numero de parejas que se formarian = ", (Order(g)-1)*(Order(g)-2),"   \n");
-
-return x;
-
+    return x;
 end;
 
-
+# dada una lista de grupos x, regresa una lista de las parejas de grupos
+# con intersección distinta de la identidad y distinta de los intersecandos
 Interseccion:=function(x)
-    
     local X1,i,j,a,b,b1,b2,cont,c;
     X1:=[];
-   # cont:=0;
-    
-    a:=((Length(x)-1)*(Length(x)))/2;
-#    PrintTo("/dev/tty","Numero de parejas = ",a," y medida de x ",Length(x),"   \n");
-    
+    # cont:=0;
+    # a:=((Length(x)-1)*(Length(x)))/2; # NO SE USA
+# PrintTo("/dev/tty","Numero de parejas = ",a," y medida de x ",Length(x),"   \n");
     c:=Combinations(x,2);
-    
     for i in [1..(Length(c))] do 
 #        for j in [(i+1)..Length(x)] do
 #            if i<>j then
-  #              cont:=cont+1;
-                
-                b1:=IsSubgroup(c[i][1],c[i][2]);
-                b2:=IsSubgroup(c[i][2],c[i][1]);
-                if b1=false and b2=false then
-                    b:=Intersection(c[i][1],c[i][2]);
-                    if 0<(Order(b)) then
-                        Add(X1,[c[i][1],c[i][2]]);
-                    fi;
-                fi; 
+#              cont:=cont+1;
+        b1:=IsSubgroup(c[i][1],c[i][2]);
+        b2:=IsSubgroup(c[i][2],c[i][1]);
+        if b1=false and b2=false then
+            b:=Intersection(c[i][1],c[i][2]);
+            if 0<(Order(b)) then
+                Add(X1,[c[i][1],c[i][2]]);
+            fi;
+        fi; 
 #            fi;
 #        od;       
     od;
-    
  #    PrintTo("/dev/tty"," Cantidad de parejas de grupos ",Length(X1),"  \n"); 
-        
-
     return X1;   
 end;
 
-
+# dada una lista de parejas de grupos X1 y un número orden, regresa
+# una lista de pares de generadores de los grupos correspondientes, pero
+# solo aquellos que no conmuten y que generen un grupo de tamaño orden.
 ParejasDeSubgrupos:=function(X1,orden)
     local i,j,c,G,ord,g1,g2,orden1,aux,list1,list2;
     c:=[];
     orden1:=0;
     ord:=0;
-    
     for i in [1..Length(X1)] do
+        # en list1 quedan los generadores del grupo X1[i][1]
+        # en list2 los del grupo X1[i][2]
         list1:=Filtered(Elements(X1[i][1]),x->Order(x)=Order(X1[i][1]));
         list2:=Filtered(Elements(X1[i][2]),x->Order(x)=Order(X1[i][2]));
-      
         g1:=list1[1];  
         g2:=list2[1]; 
- #               if Order(X1[i][1])=Order(Group(g1)) then
- #                   PrintTo("/dev/tty","Los ordenes del grupo 1 coinciden  \n");
-#                else
-#                     PrintTo("/dev/tty","**OTRO ERROR** Los ordenes de g1 NO  coinciden  \n");
-#                 fi;
-                
-#                 if Order(X1[i][2])=Order(Group(g2)) then
-#                    PrintTo("/dev/tty","Los ordenes del grupo 2 coinciden  \n");
-#                else
-#                     PrintTo("/dev/tty","**OTRO ERROR** Los ordenes de g2 NO  coinciden  \n");
-#                fi;          
-        
-        if g1*g2<>g2*g1 then
-              G:=Group(g1,g2);
-              aux:=Order(G);           
+        if g1*g2 <> g2*g1 then
+            G:=Group(g1,g2);
+            aux:=Order(G);           
             if orden = aux then   
-               Add(c,[g1,g2]);  
+                Add(c,[g1,g2]);  
             fi;
         fi;    
     od;
-#     PrintTo("/dev/tty","Cantidad de parejas de subgrupos valida ",Length(c),"  \n");
     return c;
-    
 end;
 
-    
 # a,b,c se suponen de orden 3
-ConjuntoTPrimero := function (a,b,c)    # Verifica que los elementos no cumplan las condiciones malas en caso del tipo uno. 
+# Verifica que los elementos no cumplan las condiciones malas en caso del tipo uno. 
+ConjuntoTPrimero := function (a,b,c)
     local l;
     l := [a,a^-1,b,b^-1,c,c^-1];
-
     if Length(Set(l)) <> 6 then
         return fail;
     elif
@@ -147,10 +126,10 @@ ConjuntoTPrimero := function (a,b,c)    # Verifica que los elementos no cumplan 
 end;
 
 # a,b se asumen de orden distinto a 3
-ConjuntoTSegundo := function (a,b) # Verifica que los elementos no cumplan con las condiciones malas en el caso del tipo dos
+# Verifica que los elementos no cumplan con las condiciones malas en el caso del tipo dos
+ConjuntoTSegundo := function (a,b)
     local l;
     if Order(a^-1*b)<>3 then 
-
         l := [a,a^-1,b,b^-1,a^-1*b,b^-1*a];
         if Length(Set(l)) <> 6 then
             return fail;
@@ -186,66 +165,58 @@ ConjuntoTSegundo := function (a,b) # Verifica que los elementos no cumplan con l
         fi;
     else
         return fail;
-
     fi;
-
 end;
 
 #---------------------------------------------------------------------------
-
-
-
-
+# muestra si un conjunto t determinado es válido (al regresar 1) ????
 OchoCiclosUno:=function (t)     
     local q,w,e,r,a,b,c,l,l1;
-a:=t[1];
-if t[2]<>a*a then
-   b:=t[2];
-else
-   b:=t[3];
-fi;
-l:=[a,a^-1,b,b^-1];
-l1:=Filtered(t,x-> not x in l);
-c:=l1[1];
-     q:=a*b;
-     w:=a*b^-1;
-     e:=a*c;
-     r:=a*c^-1; 
+    a:=t[1];
+    if t[2]<>a*a then
+        b:=t[2];
+    else
+        b:=t[3];
+    fi;
+    l:=[a,a^-1,b,b^-1];
+    l1:=Filtered(t,x-> not x in l);
+    c:=l1[1];
+    q:=a*b;
+    w:=a*b^-1;
+    e:=a*c;
+    r:=a*c^-1; 
     if 
-       q=b*a or q=b*a^-1 or q=b*c or q=b*c^-1 or q= c*a or q=c*a^-1
-       or q=(c^-1)*a or q= (c^-1)*(a^-1) or q=(b^-1)*a or q=(b^-1)*(a^-1)
-       or q=(b^-1)*c or q=(b^-1)*(b^-1) then
+      q=b*a or q=b*a^-1 or q=b*c or q=b*c^-1 or q=c*a or q=c*a^-1
+      or q=(c^-1)*a or q=(c^-1)*(a^-1) or q=(b^-1)*a or q=(b^-1)*(a^-1)
+      or q=(b^-1)*c or q=(b^-1)*(b^-1) then
         return fail;
     elif
-      w = b*a^-1 or w=b*c or w=b*c^-1 or w=(b^-1)*c or w=(b^-1)*(c^-1) 
+      w=b*a^-1 or w=b*c or w=b*c^-1 or w=(b^-1)*c or w=(b^-1)*(c^-1) 
       or w=c*a^-1 or w=(c^-1)*(a^-1) then
         return fail;
     elif
-      e =b*a or e=(b^-1)*a or e= c*a or  e=(c)*a^-1 or e=c*b or e=c*b^-1 
-      or e= (c^-1)*(a)  or e= (c^-1)*(a^-1)  or e= (c^-1)*(b) or e= (c^-1)*(b^-1) then
+      e=b*a or e=(b^-1)*a or e=c*a or  e=c*a^-1 or e=c*b or e=c*b^-1 
+      or e=(c^-1)*(a) or e=(c^-1)*(a^-1) or e=(c^-1)*(b) or e=(c^-1)*(b^-1) then
         return fail;
     elif
-      r = c*a^-1 or r=c*b or r=c*b^-1 or r=(c^-1)*b or r=(c^-1)*(b^-1) then
+      r=c*a^-1 or r=c*b or r=c*b^-1 or r=(c^-1)*b or r=(c^-1)*(b^-1) then
         return fail;
     else
         return 1;
     fi;
 end;
 
-
 #------------------------------------------------------------------------
 
-
 ExaminaGrupoCondicionUno := function (g,CUELLO)  # Recibe un grupo
-    local i,c,c1,l,l1,t,t1,tbuena,seis,aut,orbs,reps,reps1,OrdendeG,GrupoGenerado,Orden,g1,sinc;
- 
-   g1:=Filtered(Elements(g), x-> not x in Centre(g));
+    local i,c,c1,l,l1,t,t1,tbuena,seis,aut,orbs,reps,reps1,
+          OrdendeG,GrupoGenerado,Orden,g1,sinc;
+    g1 := Filtered(Elements(g), x-> not x in Centre(g));
     l := Filtered(Elements(g1),x->Order(x)=3);
-    l1:=EliminaInversos(l);
+    l1 := EliminaInversos(l);
     c1 := Combinations(l1,3);
-    OrdendeG:=Order(g);
+    OrdendeG := Order(g);
     c:=[];
-
     for i in [1..Length(c1)] do 
         GrupoGenerado:=Group(c1[i]);    
         Orden:=Order(GrupoGenerado); 
@@ -253,141 +224,101 @@ ExaminaGrupoCondicionUno := function (g,CUELLO)  # Recibe un grupo
             Add(c,c1[i]);
         fi;
     od;
-
-    # Print("l = ",Length(l),"l1 = ",Length(l1), " \n");
- #      Print("Hay ",Length(c)," combinaciones de tres.\n");
     aut := AutomorphismGroup(g);
-    # Print("Ya  calcule los automorfismos \n");
     orbs := Orbits(aut,c,OnSets);
-    # Print("Ya  calcule las orbitas \n");
     reps := List(orbs,x->x[1]);    
     tbuena :=[];
-    # Print("Hay ",Length(reps)," orbitas de combinaciones de tres.\n");
-
-
     for i in [1..Length(reps)] do
         t := reps[i];
-        #    PrintTo("/dev/tty","Voy en la combinacion = ",i,"     \r");
+        # PrintTo("/dev/tty","Voy en la combinacion = ",i,"     \r");
         seis := ConjuntoTPrimero(t[1],t[2],t[3]);
         if seis <> fail then
             Add(tbuena,seis);
         fi;
     od;
-    # PrintTo("/dev/tty","\n");
-
-    #Print("Voy a quitar repeticiones.\n");
+    # Print("Voy a quitar repeticiones.\n");
     tbuena := Set(tbuena,Set);
-    #Print("Voy a calcular orbitas.\n");
+    # Print("Voy a calcular orbitas.\n");
     orbs := Orbits(aut,tbuena,OnSets);
     reps := List(orbs,x->x[1]);
-#Print("Hay  ", Length(reps[1]) ," en la lista.\n");
-reps1:=[];
-
-
-
-for i in [1..Length(reps)] do
+    # Print("Hay  ", Length(reps[1]) ," en la lista.\n");
+    reps1 := [];
+    for i in [1..Length(reps)] do
         t1 := reps[i];
-#Print("t1            ", t1 ,"\n");
         sinc := OchoCiclosUno(t1);
         if sinc <> fail then
             Add(reps1,t1);
         fi;
     od;
-Print("Hay  ", Length(reps) ," combinaciones buenas despues de calcular orbitas.\n");
- Print("Hay  ", Length(reps1) ," combinaciones buenas sin ciclos de 8.\n");
+    Print("Hay  ", Length(reps) ," combinaciones buenas despues de calcular orbitas.\n");
+    Print("Hay  ", Length(reps1) ," combinaciones buenas sin ciclos de 8.\n");
     return List(reps1,x->CayleyGraph(g,x));
 end;
 
-
-
-
-
-
-
-
 # Para examinar la condicion dos
-
 ExaminaGrupoCondicionDos := function (g,CUELLO)
-    local j,i,k,c,c1,l,t,tbuena,seis,aut,orbs,reps,Orden,GrupoGenerado,OrdendeG,CUEllo,aux,Subgrupos,Inter,min,g1,g2;
-     OrdendeG:=Order(g);
-    Subgrupos:=SubgruposCiclicos(g,CUELLO);
-    Inter:=Interseccion(Subgrupos);
-    min:=ParejasDeSubgrupos(Inter,OrdendeG);
-    
-    c:=[];
-#   Print("Ya tengo las parejas de generadores.\n");
- #   g1:=Filtered(Elements(g), x-> not x in Centre(g));
-    
- #   l := Filtered (Elements(g1),x-> Order(x)>=CUELLO/2);
+    local j,i,k,c,c1,l,t,tbuena,seis,aut,orbs,reps,Orden,
+          GrupoGenerado,OrdendeG,CUEllo,aux,Subgrupos,
+          Inter,min,g1,g2;
+    OrdendeG := Order(g);
+    Subgrupos := SubgruposCiclicos(g,CUELLO);
+    Inter := Interseccion(Subgrupos);
+    min := ParejasDeSubgrupos(Inter,OrdendeG);
+    c := [];
+    # Print("Ya tengo las parejas de generadores.\n");
+    # g1:=Filtered(Elements(g), x-> not x in Centre(g));
+    # l := Filtered (Elements(g1),x-> Order(x)>=CUELLO/2);
     for k in [1..Length(min)] do
-      g1:=Elements(Group(min[k][1]));
-      g2:=Elements(Group(min[k][2]));
-      for i in [2..Length(g1)] do
-          if Order(g1[i])<>3  and Order(g1[i])>=CUELLO/2 then
-              
-          for j in [2..Length(g2)] do
-             if Order(g2[j])<>3 and  Order(g2[j])>=CUELLO/2 then
-                 c1:=[g1[i],g2[j]];
-                 if Length(Set(c1))=2 then
-       #                 PrintTo("/dev/tty","^^^^Error la medida de c1 es = ",Length(c1),"     \n");
-                 
-                     
-                        Add(c,Set(c1));
+        g1:=Elements(Group(min[k][1])); 
+        g2:=Elements(Group(min[k][2]));
+        for i in [2..Length(g1)] do
+            if Order(g1[i])<>3  and Order(g1[i])>=CUELLO/2 then
+                for j in [2..Length(g2)] do
+                    if Order(g2[j])<>3 and  Order(g2[j])>=CUELLO/2 then
+                        c1:=[g1[i],g2[j]];
+                        if Length(Set(c1))=2 then
+       # PrintTo("/dev/tty","^^^^Error la medida de c1 es = ",Length(c1),"     \n");
+                            Add(c,Set(c1));
+                        fi;
                     fi;
-                    
-              fi;
-              
-          od; 
-      fi;
-      
-      od;      
-  od;
-  
-  # Print("Esto es c antes de set",c,".\n");
- # c:=Set(c);
-  
-  # Print("Esto es c",c,".\n");
-#   Print("Ya tengo las parejas a checar y son ",Length(c),".\n");
+                od; 
+            fi;
+        od;      
+    od;
+    # Print("Esto es c antes de set",c,".\n");
+    # c:=Set(c);
+    # Print("Esto es c",c,".\n");
+    # Print("Ya tengo las parejas a checar y son ",Length(c),".\n");
     if Length(c)=0 then
-     reps:=[];       
+        reps:=[];       
         return List(reps,x->CayleyGraph(g,x));
     else    
-#    Print("Hay ",Length(c)," combinaciones de dos.\n");
-    aut := AutomorphismGroup(g);
-#     Print("Ya  calcule los automorfismos \n");
-    orbs := Orbits(aut,c,OnSets);
-#    Print("Ya  calcule las orbitas \n");
-    reps := List(orbs,x->x[1]);    
-#    reps:=c;
-    
-    tbuena :=[];
- #   Print("Despues de orbitas hay ", Length(reps),"  combinaciones de dos .\n");
-    
-    for i in [1..Length(reps)] do
-        #t := reps[i];
-#           PrintTo("/dev/tty","Voy en la combinacion = ",i,"     \n");
-        seis:=ConjuntoTSegundo(reps[i][1],reps[i][2]);
-        if seis <> fail then
-            Add(tbuena,seis);
-        fi;
-    od;
- #   PrintTo("/dev/tty","------Hay ",Length(tbuena)," combinaciones buenas \n");
-
-    #Print("Voy a quitar repeticiones.\n");
-    tbuena := Set(tbuena,Set);
-
-    orbs := Orbits(aut,tbuena,OnSets);
-    reps := List(orbs,x->x[1]);
-    #################################################################################
-    
-#    Print("Hay tbuena despues de orbitas = ", Length(reps),"\n");
-
-    return List(reps,x->CayleyGraph(g,x));
-fi;
-
+        # Print("Hay ",Length(c)," combinaciones de dos.\n");
+        aut := AutomorphismGroup(g);
+        # Print("Ya  calcule los automorfismos \n");
+        orbs := Orbits(aut,c,OnSets);
+        # Print("Ya  calcule las orbitas \n");
+        reps := List(orbs,x->x[1]);    
+        # reps:=c;
+        tbuena :=[];
+        # Print("Despues de orbitas hay ", Length(reps),"  combinaciones de dos .\n");
+        for i in [1..Length(reps)] do
+            # t := reps[i];
+            # PrintTo("/dev/tty","Voy en la combinacion = ",i,"     \n");
+            seis:=ConjuntoTSegundo(reps[i][1],reps[i][2]);
+            if seis <> fail then
+                Add(tbuena,seis);
+            fi;
+        od;
+        # PrintTo("/dev/tty","------Hay ",Length(tbuena)," combinaciones buenas \n");
+        # Print("Voy a quitar repeticiones.\n");
+        tbuena := Set(tbuena,Set);
+        orbs := Orbits(aut,tbuena,OnSets);
+        reps := List(orbs,x->x[1]);
+        # Print("Hay tbuena despues de orbitas = ", Length(reps),"\n");
+        return List(reps,x->CayleyGraph(g,x));
+    fi;
 end;
-
-
 
 # g es grafica
 GraficaDePuntosYTriangulos := function(g)
@@ -413,76 +344,53 @@ end;
 #
 ListadeGraficasUno:= function(l,grupo,CUELLO)
     local i,j,t,cuello,b;
- #   Print("Manda llamar condicion uno \n");
+    # Print("Manda llamar condicion uno \n");
     t:= ExaminaGrupoCondicionUno(l,CUELLO);
-
     if Length(t)<>0 then
         for j in [1..Length(t)] do
-
             b:= GraficaDePuntosYTriangulos(t[j]);
-            #  PrintTo("/dev/tty","Voy en la grafica = ",i,"     \r");
+            # PrintTo("/dev/tty","Voy en la grafica = ",i,"     \r");
             cuello:= Girth(b);
-              
             if cuello > (CUELLO-1) then
-
                 PrintTo("/dev/tty","-----Cuello de la grafica ",j," =             ",cuello,"      Cond  1,   grupo ",grupo,"   \n");
-
                 PrintTo("/dev/tty","Orden de la grafica  = ", OrderGraph(b),"    \n");
-
-                #PrintTo("/dev/tty","La T buena  = ", t[j] ,"    \n");
+                # PrintTo("/dev/tty","La T buena  = ", t[j] ,"    \n");
             fi;
         od;     
-        #  PrintTo("/dev/tty","\n"); 
+            # PrintTo("/dev/tty","\n"); 
     else
         cuello:=0;  
     fi; 
     return cuello;
 end;
 
-
-
-
-#
 ListadeGraficasDos:= function(l,grupo,CUELLO)
     local i,j,t,cuello,b,lg;
-
-    #PrintTo(" ya entre \n");
+    # PrintTo(" ya entre \n");
     t:= ExaminaGrupoCondicionDos(l,CUELLO);
-    #PrintTo("  examina grupo condicion dos t", t," \n");
-
-
+    # PrintTo("  examina grupo condicion dos t", t," \n");
     lg:=[];
     if Length(t) <> 0 then
-
         for j in [1..Length(t)] do
             b:= GraficaDePuntosYTriangulos(t[j]);
             cuello:= Girth(b);
-
-            #PrintTo(" cuello ", cuello," \n");
+            # PrintTo(" cuello ", cuello," \n");
             if cuello>(CUELLO-1) then
                 Add(lg,b);
-                #    return lg;
+                # return lg;
                 PrintTo("/dev/tty","----Cuello de la grafica ",j," =        ",cuello,"      Cond 2,  grupo ", grupo, "\n");    
-
                 PrintTo("/dev/tty","Orden de la grafica  = ", OrderGraph(b),"    \n");
                 PrintTo("/dev/tty","es regular =",IsRegularGraph(b),"    El grado de los vertices es =", VertexDegrees(b),"\n"); 
-
                 # PrintTo("/dev/tty","componentes de la bipartita  = ", ConnectedComponents(b),"    \n"); 
-
-                #PrintTo("/dev/tty","vertices de la grafica  = ", VertexNames(b),"    \n");
-                #PrintTo("/dev/tty","adyasencia de 1 3k2 = ", Adjacency(t[j], 1),"    \n");
-                ;  
+                # PrintTo("/dev/tty","vertices de la grafica  = ", VertexNames(b),"    \n");
+                # PrintTo("/dev/tty","adyasencia de 1 3k2 = ", Adjacency(t[j], 1),"    \n");
                 if IsConnectedGraph(b) <> true then
                     PrintTo("/dev/tty","La grafica No es conexa   \n");
                 else
                     PrintTo("/dev/tty","La grafica es conexa   \n");  
                 fi;        
-
             fi;
         od;     
-
-        #   PrintTo("/dev/tty","\n"); 
-
     else
         cuello:=0; 
     fi; 
