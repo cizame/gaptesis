@@ -461,6 +461,32 @@ GraficaDePuntosYTriangulos := function(g)
 end;
 #-------------------------------------------------------------------------
 
+EsGraficaDeCayley := function (g)
+    local aut,cc,reps,l,esono,i;
+    aut := AutGroupGraph(g);
+    if IsTransitive(aut,Vertices(g)) and Order(aut)=OrderGraph(g) then
+        return true;
+    else
+        esono := false;
+        cc := ConjugacyClassesSubgroups(aut);
+        reps := List(cc,x->x[1]);
+        l := List([1..Length(reps)],x->[x,Order(reps[x])]);
+        l := Filtered(l,x->x[2]=OrderGraph(g));
+    fi;
+ 
+     for i in [1..Length(l)] do
+        if  IsTransitive(reps[l[i][1]],Vertices(g))=true then
+            return true;
+        fi; 
+    od;
+    
+    return false;
+    
+end;
+
+
+
+
 ListadeGraficasUno:= function(l,grupo,CUELLO)
     local i,j,t,cuello,b;
 
@@ -509,7 +535,7 @@ ListadeGraficas:= function(t,grupo,CUELLO)
                 #return lg;
                 PrintTo("/dev/tty","----Cuello de la grafica ",j," =        ",cuello,"      Condicion 1,  grupo ", grupo, "\n");    
                 PrintTo("/dev/tty","Orden de la grafica  = ", OrderGraph(b),"    \n");
-                PrintTo("/dev/tty","es regular =",IsRegularGraph(b),"    El grado de los vertices es =", VertexDegrees(b),"\n"); 
+                PrintTo("/dev/tty","Es una grafica de Cayley? ",EsGraficaDeCayley(b),"\n    El grado de los vertices es =", VertexDegrees(b),"\n"); 
                 #                PrintTo("/dev/tty","La pareja que la genero es= ", pareja[j] ,"    \n"); 
                 #PrintTo("/dev/tty","adyasencia de 1 3k2 = ", Adjacency(t[j], 1),"    \n");  
                 if IsConnectedGraph(b) <> true then
@@ -556,7 +582,7 @@ ListadeGraficasDos:= function(t,grupo,CUELLO)
                 #return lg;
                 PrintTo("/dev/tty","----Cuello de la grafica ",j," =        ",cuello,"      Condicion 2,  grupo ", grupo, "\n");    
                 PrintTo("/dev/tty","Orden de la grafica  = ", OrderGraph(b),"    \n");
-                PrintTo("/dev/tty","es regular =",IsRegularGraph(b),"    El grado de los vertices es =", VertexDegrees(b),"\n"); 
+                PrintTo("/dev/tty","Es una grafica de Cayley =",IsRegularGraph(b)," \n   El grado de los vertices es =", VertexDegrees(b),"\n"); 
                 #                PrintTo("/dev/tty","La pareja que la genero es= ", pareja[j] ,"    \n"); 
                 #PrintTo("/dev/tty","adyasencia de 1 3k2 = ", Adjacency(t[j], 1),"    \n");  
                 if IsConnectedGraph(b) <> true then
@@ -1092,18 +1118,3 @@ end;
 
 
 
-
-EsGraficaDeCayley := function (g)
-    local aut,cc,reps,l,esono,i;
-    aut := AutGroupGraph(g);
-    if IsTransitive(aut,Vertices(g)) and Order(aut)=OrderGraph(g) then
-        return true;
-    else
-        esono := false;
-        cc := ConjugacyClassesSubgroups(aut);
-        reps := List(cc,x->x[1]);
-        l := List([1..Length(reps)],x->[x,Order(reps[x])]);
-        l := Filtered(l,x->x[2]=OrderGraph(g));
-    fi;
-    return;
-end;
