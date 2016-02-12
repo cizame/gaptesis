@@ -182,7 +182,7 @@ Interseccion:=function(X,g)
                 orbs := Orbits(aut,X3,OnSets);
                 #    Print("Ya  calcule las orbitas \n");
                 X33 := List(orbs,x->x[1]);    
-                #    PrintTo("/dev/tty","Ahy ", Length(X33)," parejas de subgrupos despues de orbitas\n");
+                #    PrintTo("/dev/tty","Hay ", Length(X33)," parejas de subgrupos despues de orbitas\n");
                 Posiciones:=List(X33,x-> Position(X3,x));
                 X33:=[];
                 X3:=[];
@@ -461,6 +461,32 @@ GraficaDePuntosYTriangulos := function(g)
 end;
 #-------------------------------------------------------------------------
 
+EsGraficaDeCayley := function (g)
+    local aut,cc,reps,l,esono,i;
+    aut := AutGroupGraph(g);
+    if IsTransitive(aut,Vertices(g)) and Order(aut)=OrderGraph(g) then
+        return true;
+    else
+        esono := false;
+        cc := ConjugacyClassesSubgroups(aut);
+        reps := List(cc,x->x[1]);
+        l := List([1..Length(reps)],x->[x,Order(reps[x])]);
+        l := Filtered(l,x->x[2]=OrderGraph(g));
+    fi;
+ 
+     for i in [1..Length(l)] do
+        if  IsTransitive(reps[l[i][1]],Vertices(g))=true then
+            return true;
+        fi; 
+    od;
+    
+    return false;
+    
+end;
+
+
+
+
 ListadeGraficasUno:= function(l,grupo,CUELLO)
     local i,j,t,cuello,b;
 
@@ -507,15 +533,15 @@ ListadeGraficas:= function(t,grupo,CUELLO)
                 Add(lg,b);
                 #                Add(lg1,pareja[j]);                
                 #return lg;
-                PrintTo("/dev/tty","----Cuello de la grafica ",j," =        ",cuello,"      Cond 1,  grupo ", grupo, "\n");    
+                PrintTo("/dev/tty","----Cuello de la grafica ",j," =        ",cuello,"      Condicion 1,  grupo ", grupo, "\n");    
                 PrintTo("/dev/tty","Orden de la grafica  = ", OrderGraph(b),"    \n");
-                PrintTo("/dev/tty","es regular =",IsRegularGraph(b),"    El grado de los vertices es =", VertexDegrees(b),"\n"); 
+                PrintTo("/dev/tty","Es una grafica de Cayley? ",EsGraficaDeCayley(b),"\n    El grado de los vertices es =", VertexDegrees(b),"\n"); 
                 #                PrintTo("/dev/tty","La pareja que la genero es= ", pareja[j] ,"    \n"); 
                 #PrintTo("/dev/tty","adyasencia de 1 3k2 = ", Adjacency(t[j], 1),"    \n");  
                 if IsConnectedGraph(b) <> true then
                     PrintTo("/dev/tty","La grafica No es conexa   \n");
                 else
-                    PrintTo("/dev/tty","La grafica es conexa   \n\n\n");  
+                    PrintTo("/dev/tty","La grafica es conexa \n");  
                 fi;        
             fi;
         od;
@@ -554,15 +580,15 @@ ListadeGraficasDos:= function(t,grupo,CUELLO)
                 Add(lg,b);
                 #                Add(lg1,pareja[j]);                
                 #return lg;
-                PrintTo("/dev/tty","----Cuello de la grafica ",j," =        ",cuello,"      Cond 2,  grupo ", grupo, "\n");    
+                PrintTo("/dev/tty","----Cuello de la grafica ",j," =        ",cuello,"      Condicion 2,  grupo ", grupo, "\n");    
                 PrintTo("/dev/tty","Orden de la grafica  = ", OrderGraph(b),"    \n");
-                PrintTo("/dev/tty","es regular =",IsRegularGraph(b),"    El grado de los vertices es =", VertexDegrees(b),"\n"); 
+                PrintTo("/dev/tty","Es una grafica de Cayley =",IsRegularGraph(b)," \n   El grado de los vertices es =", VertexDegrees(b),"\n"); 
                 #                PrintTo("/dev/tty","La pareja que la genero es= ", pareja[j] ,"    \n"); 
                 #PrintTo("/dev/tty","adyasencia de 1 3k2 = ", Adjacency(t[j], 1),"    \n");  
                 if IsConnectedGraph(b) <> true then
-                    PrintTo("/dev/tty","La grafica No es conexa   \n");
+                    PrintTo("/dev/tty","La grafica No es conexa \n");
                 else
-                    PrintTo("/dev/tty","La grafica es conexa   \n\n\n");  
+                    PrintTo("/dev/tty","La grafica es conexa \n");  
                 fi;        
             fi;
         od;
@@ -637,7 +663,7 @@ ExaminaGrupoCondicionUno := function (g,grupo,CUELLO)  # Recibe un grupo
 
         # Print("l = ",Length(l),"l1 = ",Length(l1), " \n");
 
-        Print("Hay ",Length(c)," combinaciones de tres que generan al grupo.\n");
+#        Print("Hay ",Length(c)," combinaciones de tres que generan al grupo.\n");
 
         if Length(c)>0 then
 
@@ -674,26 +700,16 @@ ExaminaGrupoCondicionUno := function (g,grupo,CUELLO)  # Recibe un grupo
             #Print("Voy a calcular orbitas.\n");
             orbs := Orbits(aut,tbuena,OnSets);
             reps := List(orbs,x->x[1]);
-            #Print("Hay  ", Length(reps[1]) ," en la lista.\n");
+            Print("Hay  ", Length(reps[1]) ," trios buenos.\n");
             #reps1:=[];
             orbs:=[];
 
 
 
-            #   for i in [1..Length(reps)] do
-            #       t1 := reps[i];
-            #       #Print("t1            ", t1 ,"\n");
-            #       sinc := OchoCiclosUno(t1);
-            #       if sinc <> fail then
-            #           Add(reps1,t1);
-            #       fi;
-            #   od;
-
-
             Cay:= List(reps,x->CayleyGraph(g,x));
             AUX:=Filtered(Cay,x->Adyacencia(x,CUELLO/2)<>fail);
 
-            Print("Despues de usar adyacencias hay * ",Length(AUX)," *  graficas posibles para verificar el cuello\n");
+            Print("Despues de usar adyacencias hay ",Length(AUX)," graficas posibles para verificar el cuello\n");
 
 
             numdegraf:=ListadeGraficas(AUX,grupo,CUELLO);
@@ -780,7 +796,7 @@ ExaminaGrupoCondicionDos := function (g,grupo,CUELLO)
                 g1:=Filtered(g11,x->Order(x)>3);
                 g2:=Filtered(g21,x->Order(x)>3);
             fi;
-            Print(" orden de los subgrupos en parejas  ",Length(g1)," y  ",Length(g2),"\n"); 
+            Print("+ Orden de los subgrupos en parejas  ",Length(g1)," y  ",Length(g2),"\n"); 
 
             c1c:=[];
             c11c:=[];
@@ -839,7 +855,7 @@ ExaminaGrupoCondicionDos := function (g,grupo,CUELLO)
                 orbs:=[];            
                 tbuena :=[];
                 medida:=Length(c1c);
-                Print("Hay ... ", medida,"...parejas despues de orbitas\n");
+                #Print("Hay ... ", medida,"...parejas despues de orbitas\n");
             fi;          
 
             #            Print("c1c-despues de orbitas = ",c1c,"\n");
@@ -924,7 +940,7 @@ ExaminaGrupoCondicionDos := function (g,grupo,CUELLO)
             orbs:=[];            
             tbuena :=[];
             medida:=Length(reps);
- #           Print("Hay tbuena despues de orbitas = ", medida,"\n");
+ # Print("Hay tbuena despues de orbitas = ", medida,"\n");
         fi;          
 
         for i in [1..medida] do
@@ -939,19 +955,19 @@ ExaminaGrupoCondicionDos := function (g,grupo,CUELLO)
 
     reps:=[];    
     reps1:=Set(reps1);
-    #    Print("Hay ",Length(reps1)," parejas buenas antes de orbitas\n");
+    # Print("Hay ",Length(reps1)," parejas buenas antes de orbitas\n");
 
     orbs := Orbits(aut,reps1,OnSets);
 
     #aut:=[];    
     reps1 := List(orbs,x->x[1]);   
-  #  Print("Al final hay * ",Length(reps1)," * tbuenas \n");
+    Print("Hay * ",Length(reps1)," * tbuenas \n");
 
     Cay:= List(reps1,x->CayleyGraph(g,x));
 
     AUX:=Filtered(Cay,x->Adyacencia(x,CUELLO/2)<>fail);
 
-    Print("Despues de usar adyacencias hay * ",Length(AUX)," *  graficas posibles para verificar el cuello\n");
+    Print("Despues de usar adyacencias hay ",Length(AUX)," graficas posibles para verificar el cuello\n");
 
     numdegraf:=ListadeGraficasDos(AUX,grupo,CUELLO);
     Cay:=[];
@@ -969,7 +985,7 @@ od;
     cc:=[];
     aut:=[]; 
     #return Length(numdegraf);
-    Print("\nantes de salir de cond 2\n");
+ 
     
     return numdegraf;
 
@@ -1102,18 +1118,3 @@ end;
 
 
 
-
-EsGraficaDeCayley := function (g)
-    local aut,cc,reps,l,esono,i;
-    aut := AutGroupGraph(g);
-    if IsTransitive(aut,Vertices(g)) and Order(aut)=OrderGraph(g) then
-        return true;
-    else
-        esono := false;
-        cc := ConjugacyClassesSubgroups(aut);
-        reps := List(cc,x->x[1]);
-        l := List([1..Length(reps)],x->[x,Order(reps[x])]);
-        l := Filtered(l,x->x[2]=OrderGraph(g));
-    fi;
-    return;
-end;

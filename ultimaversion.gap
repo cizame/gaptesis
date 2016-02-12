@@ -167,7 +167,7 @@ Interseccion:=function(X,g)
         if Length(X1)>1 then
             X2:= Combinations(X1,2);          
             X1:=[];            
-            #     PrintTo("/dev/tty","Ahy ", Length(X2)," parejas de subgrupos \n");
+            #     PrintTo("/dev/tty","hay ", Length(X2)," parejas de subgrupos \n");
             #     Print("primer pareja",X2[1][1]," \n");
             med:=Length(X2);            
             if med>1 then    
@@ -182,7 +182,7 @@ Interseccion:=function(X,g)
                 orbs := Orbits(aut,X3,OnSets);
                 #    Print("Ya  calcule las orbitas \n");
                 X33 := List(orbs,x->x[1]);    
-                #    PrintTo("/dev/tty","Ahy ", Length(X33)," parejas de subgrupos despues de orbitas\n");
+                #    PrintTo("/dev/tty","Hay ", Length(X33)," parejas de subgrupos despues de orbitas\n");
                 Posiciones:=List(X33,x-> Position(X3,x));
                 X33:=[];
                 X3:=[];
